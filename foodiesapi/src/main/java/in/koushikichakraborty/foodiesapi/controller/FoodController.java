@@ -1,14 +1,19 @@
 package in.koushikichakraborty.foodiesapi.controller;
 
 
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 import in.koushikichakraborty.foodiesapi.io.FoodRequest;
+import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,5 +42,21 @@ public class FoodController {
         }
         FoodResponse response = foodService.addFood(request, file); 
         return response;
+    }
+
+    @GetMapping
+    public List<FoodResponse> readFoods(){
+        return foodService.readFoods();
+    }
+
+    @GetMapping("/{id}")
+    public FoodResponse readFood(@PathVariable String id){
+        return foodService.readFood(id);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFood(@PathVariable String id){
+        foodService.deleteFood(id);
     }
 }

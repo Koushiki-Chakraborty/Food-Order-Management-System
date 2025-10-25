@@ -6,9 +6,12 @@ import in.koushikichakraborty.foodiesapi.entity.FoodEntity;
 import in.koushikichakraborty.foodiesapi.io.FoodRequest;
 import in.koushikichakraborty.foodiesapi.io.FoodResponse;
 import in.koushikichakraborty.foodiesapi.repository.FoodRepository;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -84,6 +87,44 @@ public class FoodServiceImpl implements FoodService {
             .price(entity.getPrice())
             .category(entity.getCategory())
             .build();
+    }
+
+
+    @Override
+    public List<FoodResponse> readFoods() {
+        List<FoodEntity> databaseEntries = foodRepository.findAll();
+        return databaseEntries.stream().map(object -> convertToResponse(object)).collect(Collectors.toList());
+    }
+
+
+    @Override
+    public FoodResponse readFood(String id) {
+        FoodEntity existingFood = foodRepository.findById(id).orElseThrow(() -> new RuntimeException("Food not found for the id: " + id));
+         return convertToResponse(existingFood);
+    }
+
+
+    @Override
+    public boolean deleteFile(String filename) {
+        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(filename)
+                .build();
+        s3Client.deleteObject(deleteObjectRequest);
+        return true;
+    }
+
+
+    @Override
+    public void deleteFood(String id) {
+        FoodResponse response = readFood(id);
+        String imageUrl = response.getImageUrl();
+        String filename = imageUrl.substring(imageUrl.lastIndexOf("/")+1);
+        boolean isFileDeleted = deleteFile(filename);
+        if(isFileDeleted){
+            foodRepository.deleteById(response.getId());
+        }
+
     }
 }
 
