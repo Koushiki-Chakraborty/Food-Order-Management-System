@@ -6,7 +6,6 @@ import in.koushikichakraborty.foodiesapi.entity.FoodEntity;
 import in.koushikichakraborty.foodiesapi.io.FoodRequest;
 import in.koushikichakraborty.foodiesapi.io.FoodResponse;
 import in.koushikichakraborty.foodiesapi.repository.FoodRepository;
-import lombok.AllArgsConstructor;
 
 import java.io.IOException;
 import java.util.UUID;
