@@ -1,6 +1,8 @@
 package in.koushikichakraborty.foodiesapi.controller;
 
-
+import org.springframework.http.HttpStatus; 
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -8,9 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseStatus;
+
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.web.multipart.MultipartFile;
 import in.koushikichakraborty.foodiesapi.io.FoodRequest;
 import java.util.List;
@@ -26,6 +28,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/foods")
 @AllArgsConstructor
+@CrossOrigin("*")
 public class FoodController {
 
     private final FoodService foodService;

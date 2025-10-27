@@ -22,6 +22,8 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import org.springframework.util.StringUtils; 
+
 
 
 @Service
@@ -37,8 +39,21 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     public String uploadFile(MultipartFile file) {
-        String filenameExtension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".") + 1);
-        String key = UUID.randomUUID().toString()+"." + filenameExtension;
+        
+    if (file == null || file.isEmpty()) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is empty or null");
+    }
+
+    
+    String filenameExtension = StringUtils.getFilenameExtension(file.getOriginalFilename());
+
+    
+    String key;
+    if (filenameExtension == null || filenameExtension.isEmpty()) {
+        key = UUID.randomUUID().toString(); // Use just UUID if no extension
+    } else {
+        key = UUID.randomUUID().toString() + "." + filenameExtension;
+    }
         try{
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
