@@ -2,16 +2,19 @@ import logo from "./logo.png";
 import cart from "./cart.png";
 
 import biryani from "./biryani.png";
-import burger from "./burger.png";
+import burgers from "./burger.png";
 import cakes from "./cakes.png";
 import pizza from "./pizza.png";
 import salad from "./salad.png";
-import icecream from "./ice-cream.png";
+import icecreams from "./ice-cream.png";
 import rolls from "./rolls.png";
+
+import profile from "./profile.webp";
 
 export const assets = {
   logo,
   cart,
+  profile,
 };
 
 export const categories = [
@@ -20,8 +23,8 @@ export const categories = [
     icon: biryani,
   },
   {
-    category: "Burger",
-    icon: burger,
+    category: "Burgers",
+    icon: burgers,
   },
   {
     category: "Cakes",
@@ -40,7 +43,7 @@ export const categories = [
     icon: salad,
   },
   {
-    category: "Ice Creams",
-    icon: icecream,
+    category: "Ice cream",
+    icon: icecreams,
   },
 ];

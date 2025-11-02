@@ -1,9 +1,8 @@
-import React, { use } from "react";
+import React, { useRef } from "react";
 import { categories } from "../../assets/assets";
 import "./ExploreMenu.css";
-import { useRef } from "react";
 
-const ExploreMenu = () => {
+const ExploreMenu = ({ category, setCategory }) => {
   const menuRef = useRef(null);
   const scrollLeft = () => {
     if (menuRef.current) {
@@ -38,11 +37,23 @@ const ExploreMenu = () => {
       >
         {categories.map((item, index) => {
           return (
-            <div key={index} className="text-center explore-menu-list-item">
+            <div
+              key={index}
+              className="text-center explore-menu-list-item"
+              onClick={() =>
+                setCategory((prev) =>
+                  prev === item.category ? "All" : item.category
+                )
+              }
+            >
               <img
                 src={item.icon}
                 alt=""
-                className="rounded-circle"
+                className={
+                  item.category === category
+                    ? "rounded-circle active"
+                    : "rounded-circle"
+                }
                 height={128}
                 width={128}
               />

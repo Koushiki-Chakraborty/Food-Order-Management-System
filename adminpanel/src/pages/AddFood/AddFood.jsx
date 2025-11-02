@@ -26,6 +26,8 @@ const AddFood = () => {
       return;
     }
 
+    console.log("Data before sending:", data);
+    console.log("Image file:", image);
     try {
       await addFood(data, image);
       toast.success("Food added successfully");
