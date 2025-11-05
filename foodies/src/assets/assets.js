@@ -2,8 +2,8 @@ import logo from "./logo.png";
 import cart from "./cart.png";
 
 import biryani from "./biryani.png";
-import burgers from "./burger.png";
-import cakes from "./cakes.png";
+import burgers from "./burger.jpg";
+import cakes from "./cakes.jpg";
 import pizza from "./pizza.png";
 import salad from "./salad.png";
 import icecreams from "./ice-cream.webp";

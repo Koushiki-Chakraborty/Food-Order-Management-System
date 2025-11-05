@@ -77,6 +77,7 @@ const Orders = () => {
                         onChange={(event) => updateStatus(event, order.id)}
                         value={order.orderStatus}
                       >
+                        <option value="Food Preparing">None</option>
                         <option value="Food Preparing">Food Preparing</option>
                         <option value="Out for Delivery">
                           Out for Delivery
