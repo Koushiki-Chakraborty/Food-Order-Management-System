@@ -6,15 +6,17 @@ import burgers from "./burger.png";
 import cakes from "./cakes.png";
 import pizza from "./pizza.png";
 import salad from "./salad.png";
-import icecreams from "./ice-cream.png";
+import icecreams from "./ice-cream.webp";
 import rolls from "./rolls.png";
 
 import profile from "./profile.webp";
+import delivery from "./delivery.jpg";
 
 export const assets = {
   logo,
   cart,
   profile,
+  delivery,
 };
 
 export const categories = [

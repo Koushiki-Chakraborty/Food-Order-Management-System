@@ -6,6 +6,7 @@ import {
   addToCart,
   getCartData,
   removeQtyFromCart,
+  deleteFromCart,
 } from "../service/cartService";
 
 export const StoreContext = createContext(null);
@@ -30,17 +31,25 @@ export const StoreContextProvider = (props) => {
     await removeQtyFromCart(foodId, token);
   };
 
-  const removeFromCart = (foodId) => {
+  const removeFromCart = async (foodId) => {
     setQuantities((prevQuantities) => {
       const updatedQuantities = { ...prevQuantities };
       delete updatedQuantities[foodId];
       return updatedQuantities;
     });
+
+    if (token) {
+      await deleteFromCart(foodId, token);
+    }
   };
 
   const loadCartData = async (token) => {
     const items = await getCartData(token);
     setQuantities(items);
+  };
+
+  const clearCart = () => {
+    setQuantities({});
   };
 
   const contextValue = {
@@ -53,6 +62,7 @@ export const StoreContextProvider = (props) => {
     setToken,
     setQuantities,
     loadCartData,
+    clearCart,
   };
 
   useEffect(() => {

@@ -8,7 +8,7 @@ const Menubar = () => {
   const [active, setActive] = useState("home");
   const { quantities, token, setToken, setQuantities } =
     useContext(StoreContext);
-  const uniqueItemInCart = Object.values(quantities).filter(
+  const uniqueItemInCart = Object.values(quantities || {}).filter(
     (qty) => qty > 0
   ).length;
 
@@ -44,7 +44,7 @@ const Menubar = () => {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+          <ul className="navbar-nav mx-auto mb-2 mb-lg-0">
             <li className="nav-item">
               <Link
                 className={

@@ -1,28 +1,23 @@
-package in.koushikichakraborty.foodiesapi.entity;
+package in.koushikichakraborty.foodiesapi.io;
 
 import java.util.List;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import in.koushikichakraborty.foodiesapi.io.OrderItem;
 import lombok.Builder;
 import lombok.Data;
 
-@Document(collection = "orders")
 @Data
 @Builder
-public class OrderEntity {
-    @Id
+public class OrderResponse {
     private String id;
     private String userId;
     private String userAddress;
     private String phoneNumber;
     private String email;
-    private List<OrderItem> orderedItems;
     private double amount;
     private String paymentStatus;
     private String stripePaymentIntentId;
     private String orderStatus;
+    private String clientSecret;
+    private List<OrderItem> orderedItems;
 
 }

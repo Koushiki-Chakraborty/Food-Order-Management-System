@@ -13,5 +13,5 @@ import in.koushikichakraborty.foodiesapi.entity.OrderEntity;
 public interface OrderRepository extends MongoRepository<OrderEntity, String>{
 
     List<OrderEntity> findByUserId(String userId);
-    Optional<OrderEntity> findByRazorpayOrderId(String razorpayOrderId);
+    Optional<OrderEntity> findByStripePaymentIntentId(String stripePaymentIntentId);
 }

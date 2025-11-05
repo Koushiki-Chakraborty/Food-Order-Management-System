@@ -5,6 +5,7 @@ package in.koushikichakraborty.foodiesapi.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,4 +57,15 @@ public class CartController {
         return cartService.removeFromCart(request);
     }
 
+
+
+@DeleteMapping("/{foodId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteItemFromCart(@PathVariable String foodId) {
+        if(foodId == null || foodId.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "foodId not found");
+        }
+        // You will need to create this 'deleteItemFromCart' method in your CartService
+        cartService.deleteItemFromCart(foodId);
+    }
 }

@@ -13,4 +13,6 @@ public interface CartService {
 
     CartResponse removeFromCart(CartRequest cartRequest);
 
+    void deleteItemFromCart(String foodId);
+
 }
