@@ -15,21 +15,15 @@ const Orders = () => {
 
     try {
       const response = await axios.patch(
-        // 1. The URL should ONLY contain the orderId
         `http://localhost:8080/api/orders/status/${orderId}`,
 
-        // 2. Send the status in the request BODY as a JSON object
         { status: newStatus }
-
-        // 3. No token is needed since you made it public
       );
 
       if (response.status === 200) {
-        // Refresh the list
         await fetchOrders();
       }
     } catch (error) {
-      // 4. This will log the error instead of crashing
       console.error("Failed to update status:", error);
     }
   };
