@@ -50,7 +50,7 @@ const FoodItem = ({ name, description, id, imageUrl, price }) => {
           <Link className="btn btn-primary btn-sm" to={`/food/${id}`}>
             View Food
           </Link>
-          {quantities[id] > 0 ? (
+          {(quantities?.[id] ?? 0) > 0 ? (
             <div className="d-flex align-items-center gap-2">
               <button
                 className="btn btn-danger btn-sm"
@@ -58,9 +58,9 @@ const FoodItem = ({ name, description, id, imageUrl, price }) => {
               >
                 <i className="bi bi-dash-circle"></i>
               </button>
-              <span className="fw-bold">{quantities[id]}</span>
+              <span className="fw-bold">{quantities?.[id] ?? 0}</span>
               <button
-                className="btn btn-sucess btn-sm"
+                className="btn btn-success btn-sm"
                 onClick={() => increaseQty(id)}
               >
                 <i className="bi bi-plus-circle"></i>

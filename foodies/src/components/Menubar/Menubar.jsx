@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import "./Menubar.css";
 import { assets } from "../../assets/assets.js";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,13 +6,23 @@ import { StoreContext } from "../../context/StoreContext.jsx";
 
 const Menubar = () => {
   const [active, setActive] = useState("home");
-  const { quantities, token, setToken, setQuantities } =
+  const { quantities, token, setToken, setQuantities, user } =
     useContext(StoreContext);
-  const uniqueItemInCart = Object.values(quantities || {}).filter(
-    (qty) => qty > 0
-  ).length;
+
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -20,6 +30,11 @@ const Menubar = () => {
     navigate("/");
     setQuantities({});
   };
+
+  const uniqueItemInCart = Object.values(quantities || {}).filter(
+    (qty) => qty > 0
+  ).length;
+
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
       <div className="container">
@@ -113,33 +128,53 @@ const Menubar = () => {
                 </button>
               </>
             ) : (
-              <div className="dropdown text-end">
-                <a
-                  href="#"
-                  className="d-block link-body-emphasis text-decoration-none dropdown-toggle"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
+              <div className="position-relative" ref={dropdownRef}>
+                <button
+                  className="btn border-0 bg-transparent p-0 d-flex align-items-center"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
                 >
                   <img
                     src={assets.profile}
-                    alt=""
+                    alt="profile"
                     width={32}
                     height={32}
                     className="rounded-circle"
                   />
-                </a>
+                  <i
+                    className={`bi bi-caret-${
+                      dropdownOpen ? "up" : "down"
+                    }-fill ms-1`}
+                  ></i>
+                </button>
 
-                <ul className="dropdown-menu text-small">
-                  <li
-                    className="dropdown-item"
-                    onClick={() => navigate("/myorders")}
+                {dropdownOpen && (
+                  <ul
+                    className="dropdown-menu text-small show"
+                    style={{
+                      position: "absolute",
+                      right: 0,
+                      top: "40px",
+                      display: "block",
+                      zIndex: 1000,
+                    }}
                   >
-                    Orders
-                  </li>
-                  <li className="dropdown-item" onClick={logout}>
-                    Logout
-                  </li>
-                </ul>
+                    <li className="dropdown-item-text text-muted small text-truncate text-center px-2">
+                      {user?.email}
+                    </li>
+                    <li>
+                      <hr className="dropdown-divider" />
+                    </li>
+                    <li
+                      className="dropdown-item"
+                      onClick={() => navigate("/myorders")}
+                    >
+                      Orders
+                    </li>
+                    <li className="dropdown-item" onClick={logout}>
+                      Logout
+                    </li>
+                  </ul>
+                )}
               </div>
             )}
           </div>
