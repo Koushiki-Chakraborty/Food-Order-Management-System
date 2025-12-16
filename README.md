@@ -1,12 +1,12 @@
-# 🍔 FOOD ORDER MANAGEMENT SYSTEM (FULL-STACK)
+# FOOD ORDER MANAGEMENT SYSTEM (FULL-STACK)
 
 A robust, three-tier food delivery application designed for both seamless user ordering and secure administrative management. The project features a modern stack with a focus on secure payment processing and data integrity.
 
 ---
 
-## ✨ FEATURES
+## FEATURES
 
-### 👨‍🍳 USER FEATURES
+### USER FEATURES
 - **Authentication:** Secure login and registration using **JWT**.  
 - **Cart Persistence:** Shopping cart contents are persistently stored in the database.  
 - **Secure Checkout:** Integrates **Stripe Checkout Session** (redirect flow) for secure payments.  
@@ -15,7 +15,7 @@ A robust, three-tier food delivery application designed for both seamless user o
 - **Reorder Functionality:** Quickly add items from a previous order back to the current cart.
 - **Image Optimization:** Product and menu images are served securely from **AWS S3** for fast delivery.  
 
-### 🧑‍💼 ADMIN FEATURES
+### ADMIN FEATURES
 - **Dashboard Overview:** View a list of all user orders (`/api/orders/all`).  
 - **Status Management:** Update order status (e.g., *Food Preparing*, *Out for Delivery*) via a dedicated **PATCH** endpoint.  
 - **Customer Data Retrieval:** View customer contact details (Address, Phone, Email) via a specialized modal without exposing them in the main table view.
@@ -23,7 +23,7 @@ A robust, three-tier food delivery application designed for both seamless user o
 
 ---
 
-## 🛡️ SECURITY HIGHLIGHTS
+## SECURITY HIGHLIGHTS
 - **Server-Side Price Validation:** The final order amount, tax, and shipping are securely calculated on the server using database prices, preventing client-side manipulation.  
 - **Data Robustness:** Logic implemented to handle concurrent requests and prevent database crashes from duplicate cart records.  
 - **Token-Based Access:** All order and cart endpoints require a valid **JWT** (authenticated user).
@@ -31,9 +31,9 @@ A robust, three-tier food delivery application designed for both seamless user o
 
 ---
 
-## 💻 TECH STACK
+## TECH STACK
 
-### 🧠 BACKEND (`foodiesapi`)
+### BACKEND (`foodiesapi`)
 | Technology | Description |
 |-------------|-------------|
 | **Language** | Java 23 |
@@ -43,7 +43,7 @@ A robust, three-tier food delivery application designed for both seamless user o
 | **Security** | Spring Security 6 (JWT Authentication) |
 | **Payment Gateway** | Stripe Java SDK (Checkout Sessions) |
 
-### 💅 FRONTEND (`foodies` & `adminpanel`)
+### FRONTEND (`foodies` & `adminpanel`)
 | Technology | Description |
 |-------------|-------------|
 | **Library** | React.js (Functional Components & Hooks) |
@@ -52,7 +52,7 @@ A robust, three-tier food delivery application designed for both seamless user o
 | **State Management** | React Context API (Global State) |
 | **Cloud Integration** | AWS S3 for media storage and delivery |
 
-## 📁 PROJECT STRUCTURE
+## PROJECT STRUCTURE
 Food-Order-Management-System/
 ├── adminpanel/ # FRONTEND: Admin Interface
 ├── foodies/ # FRONTEND: User Interface
@@ -61,9 +61,9 @@ Food-Order-Management-System/
 
 ---
 
-## 🚀 SETUP AND INSTALLATION
+## SETUP AND INSTALLATION
 
-### 1️⃣ DATABASE AND ENVIRONMENT
+### 1️. DATABASE AND ENVIRONMENT
 - Ensure **MongoDB** is running locally (default port `27017`).  
 - Set up your **Stripe API Keys** in:
   foodiesapi/src/main/resources/application.properties
@@ -86,7 +86,7 @@ jwt.secret.key=YOUR_RANDOMLY_GENERATED_SECRET_KEY
 # Stripe configuration
 stripe.api.key=sk_test_51XXXXXXYYYYYYZZZZZZZZZZZZZZ
 ```
-### 2️⃣ BACKEND SETUP (foodiesapi)
+### 2. BACKEND SETUP (foodiesapi)
 ```
 cd foodiesapi
 ./mvnw clean install
@@ -95,7 +95,7 @@ cd foodiesapi
 
 The API will run at: http://localhost:8080
 
-### 3️⃣ FRONTEND SETUP (foodies & adminpanel)
+### 3. FRONTEND SETUP (foodies & adminpanel)
 
 For both frontend applications (run separately on different ports):
 ```
@@ -109,7 +109,7 @@ Then start each application:
 ```
 npm run dev
 ```
-## 🧾 NOTES
+## NOTES
 
 - Ensure both frontends and backend are running simultaneously.
 
@@ -120,4 +120,4 @@ npm run dev
 
 ---
 
-# 🧡 Developed with passion for clean code, data integrity, and a seamless food ordering experience.
+# Developed with passion for clean code, data integrity, and a seamless food ordering experience.
