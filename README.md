@@ -54,10 +54,10 @@ A robust, three-tier food delivery application designed for both seamless user o
 
 ## PROJECT STRUCTURE
 Food-Order-Management-System/
-├── adminpanel/ # FRONTEND: Admin Interface
-├── foodies/ # FRONTEND: User Interface
-├── foodiesapi/ # BACKEND: Spring Boot API
-└── package.json
+── adminpanel/ # FRONTEND: Admin Interface
+── foodies/ # FRONTEND: User Interface
+── foodiesapi/ # BACKEND: Spring Boot API
+── package.json
 
 ---
 
