@@ -27,7 +27,7 @@ body {
 }
 
 #page-content-wrapper {
-  min-width: 100vw;
+  min-width: 100%;
 }
 
 body.sb-sidenav-toggled #wrapper #sidebar-wrapper {

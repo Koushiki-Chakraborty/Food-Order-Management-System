@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class AuthenticationResponse {
-    private String email;
     private String token;
+    private String email;
 }

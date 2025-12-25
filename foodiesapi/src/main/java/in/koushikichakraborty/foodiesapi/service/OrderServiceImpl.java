@@ -39,7 +39,9 @@ public class OrderServiceImpl implements OrderService {
 
     @PostConstruct
     public void initStripe() {
-        Stripe.apiKey = STRIPE_API_KEY;
+        String keyUsed = STRIPE_API_KEY;
+        Stripe.apiKey = keyUsed;
+    System.out.println("Stripe Client Initialized with Key: " + keyUsed);
     }
 
     private double recalculateAmount(List<OrderItem> orderedItems) {
@@ -209,7 +211,7 @@ public class OrderServiceImpl implements OrderService {
         savedOrder.setStripePaymentIntentId(session.getPaymentIntent());
         orderRepository.save(savedOrder);
         
-        return session.getId();
+        return session.getUrl();
     }
 
     @Override

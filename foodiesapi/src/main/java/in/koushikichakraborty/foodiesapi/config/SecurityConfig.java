@@ -12,7 +12,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -21,7 +22,9 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import in.koushikichakraborty.foodiesapi.filters.JwtAuthenticationFilter;
+import in.koushikichakraborty.foodiesapi.service.AdminAuthService;
 import in.koushikichakraborty.foodiesapi.service.AppUserDetailsService;
+
 import lombok.AllArgsConstructor;
 
 @Configuration
@@ -31,44 +34,42 @@ public class SecurityConfig {
 
     private final AppUserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final AdminAuthService adminAuthService;
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors(Customizer.withDefaults()) 
             .csrf(AbstractHttpConfigurer::disable)
+            .headers(headers -> headers
+            .frameOptions(frame -> frame.disable())
+        )
             .authorizeHttpRequests(auth -> auth
                 
-                .requestMatchers(
-                    "/api/register", 
-                    "/api/login", 
-                    "/api/foods/**",
-                    "/api/orders/all",         
-                    "/api/orders/status/**"   
-                ).permitAll()
+                // 1. PUBLIC ROUTES (Always first)
+                .requestMatchers("/ws-tracking/**").permitAll()
+                .requestMatchers("/api/register", "/api/login", "/api/foods").permitAll()
+                .requestMatchers("/api/admin/auth/**").permitAll() // Group admin auth together
+                
+                // 2. ADMIN ONLY ROUTES
+                .requestMatchers("/api/foods/**").hasAuthority("ADMIN") 
+                .requestMatchers("/api/orders/all", "/api/orders/status/**").hasAuthority("ADMIN") 
 
-            
-                .requestMatchers(
-                    "/api/orders", 
-                    "/api/orders/create-checkout-session", 
-                    "/api/orders/{orderId}",
-                    "/api/cart/**",
-                    "/api/orders/confirm"
-                ).authenticated()
+                // 3. USER/AUTHENTICATED ROUTES
+                .requestMatchers("/api/cart/**").authenticated() // Explicitly put cart here
+                .requestMatchers("/api/orders/**").authenticated()
+                .requestMatchers("/api/orders/confirm").authenticated()
                 
-                
-                .anyRequest().authenticated() 
+                // 4. FALLBACK
+                .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
+    
 
     @Bean // <-- 2. ADD @Bean HERE
     public CorsConfigurationSource corsConfigurationSource() { // <-- 3. Make PUBLIC
@@ -85,9 +86,23 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return new ProviderManager(authProvider);
+        // 1. Regular User Authentication Provider
+        DaoAuthenticationProvider userAuthProvider = new DaoAuthenticationProvider();
+        userAuthProvider.setUserDetailsService(userDetailsService); // Uses AppUserDetailsService (for UserEntity)
+        userAuthProvider.setPasswordEncoder(passwordEncoder);
+
+        // 2. Admin User Authentication Provider
+        DaoAuthenticationProvider adminAuthProvider = new DaoAuthenticationProvider();
+        // Create a dedicated UserDetailsService for the AdminUser logic
+        adminAuthProvider.setUserDetailsService(createAdminUserDetailsService()); 
+        adminAuthProvider.setPasswordEncoder(passwordEncoder);
+
+        // ProviderManager allows Spring Security to cycle through providers until one succeeds
+        return new ProviderManager(List.of(userAuthProvider, adminAuthProvider));
+    }
+
+    @Bean
+    public UserDetailsService createAdminUserDetailsService() {
+        return email -> adminAuthService.loadAdminByEmail(email);
     }
 }

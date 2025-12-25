@@ -1,9 +1,11 @@
 package in.koushikichakraborty.foodiesapi.service;
 
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import in.koushikichakraborty.foodiesapi.entity.UserEntity;
 import in.koushikichakraborty.foodiesapi.io.UserRequest;
@@ -45,8 +47,13 @@ public class UserServiceImpl implements userService{
 
     @Override
     public String findByUserId() {
-        String loggedInUserEmail = authenticationFacade.getAuthentication().getName();
-        UserEntity loggedInUser = userRepository.findByEmail(loggedInUserEmail).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return loggedInUser.getId();
+        var auth = authenticationFacade.getAuthentication();
+    if (auth == null || !auth.isAuthenticated() || auth.getPrincipal().equals("anonymousUser")) {
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not logged in");
+    }
+    String loggedInUserEmail = auth.getName();
+    UserEntity loggedInUser = userRepository.findByEmail(loggedInUserEmail)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + loggedInUserEmail));
+    return loggedInUser.getId();
     }
 }

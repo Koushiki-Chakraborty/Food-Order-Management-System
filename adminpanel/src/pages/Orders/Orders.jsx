@@ -1,14 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { assets } from "../../assets/assests";
+import { toast } from "react-toastify";
 
 const Orders = () => {
   const [data, setData] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null); // State for modal data
 
+  const getAuthAxios = useCallback(() => {
+    const token = localStorage.getItem("adminToken");
+    return axios.create({
+      baseURL: "http://localhost:8080/api/orders",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  }, []);
+
   const fetchOrders = async () => {
-    const response = await axios.get("http://localhost:8080/api/orders/all");
-    setData(response.data);
+    try {
+      const authAxios = getAuthAxios();
+      const response = await authAxios.get("/all");
+      setData(response.data);
+    } catch (error) {
+      console.error("Failed to fetch orders:", error);
+      toast.error("Failed to load orders. Check login status.");
+    }
   };
 
   const viewCustomerDetails = (order) => {
@@ -24,23 +42,23 @@ const Orders = () => {
     const newStatus = event.target.value;
 
     try {
-      const response = await axios.patch(
-        `http://localhost:8080/api/orders/status/${orderId}`,
-
-        { status: newStatus }
-      );
+      const authAxios = getAuthAxios();
+      const response = await authAxios.patch(`/status/${orderId}`, {
+        status: newStatus,
+      });
 
       if (response.status === 200) {
         await fetchOrders();
       }
     } catch (error) {
       console.error("Failed to update status:", error);
+      toast.error("Failed to update status.");
     }
   };
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [getAuthAxios]);
 
   return (
     <div className="container">
