@@ -50,7 +50,7 @@ public class SecurityConfig {
                 // 1. PUBLIC ROUTES
                 .requestMatchers("/api/register", "/api/login", "/api/admin/auth/**").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/foods/**").permitAll() // Allow everyone to VIEW foods
-                .requestMatchers("/ws-tracking/**").permitAll()
+                .requestMatchers("/ws/**").permitAll()
 
                 // 2. ADMIN ONLY ROUTES
                 .requestMatchers("/api/foods/**").hasAuthority("ADMIN") 

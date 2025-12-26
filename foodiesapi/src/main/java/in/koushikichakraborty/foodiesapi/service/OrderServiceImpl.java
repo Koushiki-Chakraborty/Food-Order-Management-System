@@ -17,6 +17,7 @@ import in.koushikichakraborty.foodiesapi.entity.OrderEntity;
 import in.koushikichakraborty.foodiesapi.io.OrderRequest;
 import in.koushikichakraborty.foodiesapi.io.OrderResponse;
 import in.koushikichakraborty.foodiesapi.repository.OrderRepository;
+import in.koushikichakraborty.foodiesapi.service.DriverSimulatorService;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final userService userService; 
     private final FoodRepository foodRepository; 
+    private final DriverSimulatorService deliverySimulationService;
 
     @Value("${stripe.api.key}")
     private String STRIPE_API_KEY;
@@ -108,6 +110,13 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         entity.setOrderStatus(status);
         orderRepository.save(entity);
+
+       if ("Out for Delivery".equalsIgnoreCase(status)) {
+        System.out.println("✅ Starting driver simulation");
+        deliverySimulationService.startDeliverySimulation(orderId);
+    } else {
+        System.out.println("❌ Status did not match Out for Delivery");
+    }
     }
 
 

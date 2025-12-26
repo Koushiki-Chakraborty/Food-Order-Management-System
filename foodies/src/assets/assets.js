@@ -11,12 +11,14 @@ import rolls from "./rolls.png";
 
 import profile from "./profile.webp";
 import delivery from "./delivery.jpg";
+import bike from "./bike_icon.jpg";
 
 export const assets = {
   logo,
   cart,
   profile,
   delivery,
+  bike,
 };
 
 export const categories = [

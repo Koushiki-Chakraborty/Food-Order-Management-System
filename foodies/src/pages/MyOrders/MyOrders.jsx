@@ -271,7 +271,20 @@ const MyOrders = () => {
               )}
             </div>
 
-            <div className="modal-footer">
+            <div className="modal-footer d-flex justify-content-between">
+              <div>
+                {selectedOrder?.orderStatus === "Out for Delivery" && (
+                  <button
+                    type="button"
+                    className="btn btn-success"
+                    data-bs-dismiss="modal"
+                    onClick={() => navigate(`/track/${selectedOrder.id}`)}
+                  >
+                    <i className="bi bi-geo-alt-fill me-2"></i>Track Order
+                  </button>
+                )}
+              </div>
+
               <button
                 type="button"
                 className="btn btn-danger"

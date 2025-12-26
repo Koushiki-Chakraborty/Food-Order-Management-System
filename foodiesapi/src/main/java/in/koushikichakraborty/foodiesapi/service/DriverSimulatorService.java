@@ -1,68 +1,100 @@
 package in.koushikichakraborty.foodiesapi.service;
 
-import in.koushikichakraborty.foodiesapi.model.DriverLocation;
+import in.koushikichakraborty.foodiesapi.io.DriverLocation;
+import in.koushikichakraborty.foodiesapi.repository.OrderRepository;
+import in.koushikichakraborty.foodiesapi.entity.OrderEntity;
+import lombok.RequiredArgsConstructor;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 
-import java.util.List;
-import java.util.Map;
-
-import java.util.concurrent.ConcurrentHashMap;
-
 @Service
-@EnableScheduling
+@RequiredArgsConstructor
 public class DriverSimulatorService {
+    private final SimpMessagingTemplate messagingTemplate;
+    private final OrderRepository orderRepository;
 
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+    // A simplified route from Kolkata to Durgapur
+    private final double[][] route = {
+         {22.5726, 88.3639},
+            {22.60, 88.30},
+            {22.65, 88.20},
+            {22.72, 88.10},
+            {22.80, 88.00},
+            {22.90, 87.90},
+            {22.98, 87.85},
+            {23.10, 87.70},
+            {23.25, 87.50},
+            {23.35, 87.40},
+            {23.4846, 87.3188}
+    };
 
-    // Stores the road path for each order
-    private final Map<String, List<Map<String, Double>>> pathsMap = new ConcurrentHashMap<>();
-    // Stores the current index (how far the bike is along the road)
-    private final Map<String, Integer> indexMap = new ConcurrentHashMap<>();
+    @Async
+    public void startDeliverySimulation(String orderId) {
+        int microSteps = 20; // smaller = smoother
 
-    public void addOrderToTrack(String orderId, List<Map<String, Double>> path) {
-        pathsMap.put(orderId, path);
-        indexMap.put(orderId, 0);
-    }
-    @Scheduled(fixedRate = 500) // Increase frequency to 500ms for smoother movement
-    public void simulateDriverMovement() {
-    for (String orderId : pathsMap.keySet()) {
-        List<Map<String, Double>> path = pathsMap.get(orderId);
-        int currentIndex = indexMap.get(orderId);
+    for (int i = 0; i < route.length - 1; i++) {
 
-        // ✅ Change '+ 1' to '+ 10' or '+ 20' to skip tiny points and move faster along the road
-        int nextIndex = currentIndex + 20; 
+        double startLat = route[i][0];
+        double startLng = route[i][1];
 
-        if (nextIndex < path.size()) {
-            Map<String, Double> coords = path.get(nextIndex);
-            
-            DriverLocation location = new DriverLocation(
-                orderId, 
-                coords.get("latitude"), 
-                coords.get("longitude")
+        double endLat = route[i + 1][0];
+        double endLng = route[i + 1][1];
+
+        double latStep = (endLat - startLat) / microSteps;
+        double lngStep = (endLng - startLng) / microSteps;
+
+        double currentLat = startLat;
+        double currentLng = startLng;
+
+        for (int j = 0; j < microSteps; j++) {
+
+            DriverLocation loc =
+            new DriverLocation(orderId, currentLat, currentLng, "MOVING");
+
+            // System.out.println(
+            //     "Driver moving -> lat=" + currentLat + ", lng=" + currentLng
+            // );
+
+            messagingTemplate.convertAndSend(
+                "/topic/delivery/" + orderId,
+                loc
             );
 
-            messagingTemplate.convertAndSend("/topic/location/" + orderId, location);
-            
-            indexMap.put(orderId, nextIndex);
-        } else {
-            Map<String, Double> finalPoint = path.get(path.size() - 1);
-            // Send the exact destination one last time
-            messagingTemplate.convertAndSend("/topic/location/" + orderId, 
-                new DriverLocation(orderId, finalPoint.get("latitude"), finalPoint.get("longitude")));
-            
-            // Cleanup memory
-            pathsMap.remove(orderId);
-            indexMap.remove(orderId);
-            System.out.println("Driver has arrived at Durgapur for order: " + orderId);
+            currentLat += latStep;
+            currentLng += lngStep;
+
+            try {
+                Thread.sleep(500); // smooth movement
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
-}
+            double[] finalPoint = route[route.length - 1];
+
+            orderRepository.findById(orderId).ifPresent(order -> {
+                order.setOrderStatus("Delivered");
+                orderRepository.save(order);
+            });
+
+                DriverLocation completed =
+                    new DriverLocation(
+                        orderId,
+                        finalPoint[0],
+                        finalPoint[1],
+                        "COMPLETED"
+                    );
+
+                messagingTemplate.convertAndSend(
+                    "/topic/delivery/" + orderId,
+                    completed
+                );
+
+                System.out.println("Delivery completed for order " + orderId);
+
+    }
 }

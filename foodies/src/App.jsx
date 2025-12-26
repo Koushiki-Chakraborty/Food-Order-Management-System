@@ -14,6 +14,7 @@ import MyOrders from "./pages/MyOrders/MyOrders";
 import VerifyPayment from "./pages/VerifyPayment/VerifyPayment";
 import { useContext } from "react";
 import { StoreContext } from "./context/StoreContext";
+import TrackOrder from "./pages/TrackOrder/TrackOrder";
 
 const App = () => {
   const { token } = useContext(StoreContext);
@@ -32,6 +33,10 @@ const App = () => {
         <Route path="/register" element={token ? <Home /> : <Register />} />
         <Route path="/myorders" element={token ? <MyOrders /> : <Login />} />
         <Route path="/verify" element={token ? <VerifyPayment /> : <Login />} />
+        <Route
+          path="/track/:orderId"
+          element={token ? <TrackOrder /> : <Login />}
+        />
       </Routes>
     </div>
   );

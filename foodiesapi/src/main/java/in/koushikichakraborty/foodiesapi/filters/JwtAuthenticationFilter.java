@@ -51,11 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
-    // Use startsWith to catch all SockJS sub-paths like /info, /iframe, etc.
-            if (path.startsWith("/ws-tracking")) {
-                return true;
-            }
-            return publicMatchers.stream().anyMatch(matcher -> matcher.matches(request));
+        return path.startsWith("/ws"); // This tells the filter "don't look for a token if it's a websocket"
     }
 
     @Override
@@ -107,4 +103,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
+
 }
