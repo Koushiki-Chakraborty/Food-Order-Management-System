@@ -1,8 +1,6 @@
 package in.koushikichakraborty.foodiesapi.service;
 
-
-import java.util.Collections;
-
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,6 +10,8 @@ import org.springframework.stereotype.Service;
 import in.koushikichakraborty.foodiesapi.entity.UserEntity;
 import in.koushikichakraborty.foodiesapi.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -24,7 +24,9 @@ public class AppUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         UserEntity user = userRepository.findByEmail(email)
             .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return new User(user.getEmail(), user.getPassword(), Collections.emptyList());
+        return new User(user.getEmail(), 
+                        user.getPassword(), 
+                        List.of(new SimpleGrantedAuthority("ROLE_USER")));
     }
 
     

@@ -211,7 +211,7 @@ public class OrderServiceImpl implements OrderService {
         savedOrder.setStripePaymentIntentId(session.getPaymentIntent());
         orderRepository.save(savedOrder);
         
-        return session.getUrl();
+        return session.getId();
     }
 
     @Override

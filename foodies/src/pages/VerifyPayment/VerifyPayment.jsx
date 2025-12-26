@@ -1,47 +1,57 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import api from "../../api/axiosConfig";
 
 const VerifyPayment = () => {
   const { token, clearCart } = useContext(StoreContext);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  const hasRun = useRef(false);
+
   // This is the logic you wanted to move
   const verify = async () => {
+    if (hasRun.current) return;
+
     const success = searchParams.get("success") === "true";
     const orderId = searchParams.get("orderId");
 
-    if (!token || !orderId) {
-      navigate("/"); // Not enough info, go home
+    if (!success) {
+      toast.error("Payment cancelled or failed.");
+      navigate("/cart");
+      return;
+    }
+
+    if (!orderId) {
+      navigate("/");
       return;
     }
 
     try {
-      await axios.post(
-        "http://localhost:8080/api/orders/confirm",
-        { orderId },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      hasRun.current = true;
+      // CHANGE: Using 'api' instance instead of 'axios' to use the interceptor
+      await api.post("/orders/confirm", { orderId });
+
       toast.success("Payment successful!");
       clearCart();
+      navigate("/myorders");
     } catch (err) {
       console.error("Payment verification failed:", err);
       toast.error("Failed to verify payment.");
-    } finally {
-      // After trying to confirm, always go to the My Orders page
-      navigate("/myorders");
+      navigate("/");
     }
   };
 
   useEffect(() => {
-    // Wait for the token to be loaded before running
-    if (token) {
+    // CHANGE: Check localStorage directly for token persistence
+    const storedToken = localStorage.getItem("token");
+    if (token || storedToken) {
       verify();
     }
-  }, [token, searchParams]); // Run when token is available
+  }, [token]);
 
   // Show a simple loading spinner/message
   return (

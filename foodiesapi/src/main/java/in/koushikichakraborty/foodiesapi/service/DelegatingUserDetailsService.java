@@ -1,14 +1,15 @@
 package in.koushikichakraborty.foodiesapi.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-// This service will check both the regular User repository and the Admin repository.
 @Service("delegatingUserDetailsService")
-public class DelegatingUserDetailsService implements UserDetailsService{
+@Primary
+public class DelegatingUserDetailsService implements UserDetailsService {
 
     @Autowired
     private AppUserDetailsService appUserDetailsService;
@@ -18,17 +19,16 @@ public class DelegatingUserDetailsService implements UserDetailsService{
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // 1. Try to load as a regular user
         try {
+            // Priority 1: Check regular users
             return appUserDetailsService.loadUserByUsername(email);
         } catch (UsernameNotFoundException e) {
-            // 2. If regular user lookup fails, try to load as an admin user
+            // Priority 2: Fallback to Admin users
             try {
-                // Assuming adminAuthService.loadAdminByEmail returns AdminUser (which implements UserDetails)
                 return adminAuthService.loadAdminByEmail(email);
-            } catch (UsernameNotFoundException ex) {
-                // 3. If still not found, throw the final exception
-                throw new UsernameNotFoundException("User or Admin not found with email: " + email);
+            } catch (Exception ex) {
+                // Final Fallback: Neither exists
+                throw new UsernameNotFoundException("No account found for: " + email);
             }
         }
     }

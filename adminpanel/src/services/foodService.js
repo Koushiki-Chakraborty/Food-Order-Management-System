@@ -1,17 +1,8 @@
-import axios from "axios";
+import api from "../api/axiosConfig";
+
+const FOODS_ENDPOINT = "/foods";
 
 const API_URL = "http://localhost:8080/api/foods";
-
-const getAuthHeaders = () => {
-  const adminToken = localStorage.getItem("adminToken");
-  if (!adminToken) {
-    console.error("Authentication token not found.");
-    return {};
-  }
-  return {
-    Authorization: `Bearer ${adminToken}`,
-  };
-};
 
 export const addFood = async (foodData, image) => {
   const formData = new FormData();
@@ -19,40 +10,34 @@ export const addFood = async (foodData, image) => {
   formData.append("file", image);
 
   try {
-    await axios.post(API_URL, formData, {
+    const response = await api.post(FOODS_ENDPOINT, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        ...getAuthHeaders(),
       },
     });
+    return response.data;
   } catch (error) {
-    console.log("Error", error);
+    console.error("Error adding food:", error);
     throw error;
   }
 };
 
 export const getFoodList = async () => {
   try {
-    const response = await axios.get(API_URL, {
-      headers: getAuthHeaders(),
-    });
-
+    const response = await api.get(FOODS_ENDPOINT);
     return response.data;
   } catch (error) {
-    console.log("Error fetching food list:", error);
+    console.error("Error fetching food list:", error);
     throw error;
   }
 };
 
 export const deleteFood = async (foodId) => {
   try {
-    const response = await axios.delete(API_URL + "/" + foodId, {
-      headers: getAuthHeaders(),
-    });
-
+    const response = await api.delete(`${FOODS_ENDPOINT}/${foodId}`);
     return response.status === 204 || response.status === 200;
   } catch (error) {
-    console.log("Error deleting food item:", error);
+    console.error("Error deleting food item:", error);
     throw error;
   }
 };

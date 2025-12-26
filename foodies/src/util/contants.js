@@ -1,1 +1,2 @@
-export const STRIPE_PUBLISHABLE_KEY = "pk_.....";
+export const STRIPE_PUBLISHABLE_KEY =
+  "pk_test_51SOtT9QxDTJxqQvRjPas1FxNAe52eNUE0mOgOTqbHHv2qWNZH9f3klGWzq1wMTESXfUnfxeSC2RQh0f7vLpGjaTW00m4TroDkD";

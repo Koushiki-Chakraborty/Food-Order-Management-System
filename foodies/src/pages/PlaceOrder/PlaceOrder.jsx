@@ -3,7 +3,7 @@ import "./PlaceOrder.css";
 import { assets } from "../../assets/assets";
 import { StoreContext } from "../../context/StoreContext";
 import { calculateCartTotals } from "../../util/cartUtils";
-import axios from "axios";
+import api from "../../api/axiosConfig";
 import { STRIPE_PUBLISHABLE_KEY } from "../../util/contants";
 
 import { toast } from "react-toastify";
@@ -34,6 +34,11 @@ const PlaceOrder = () => {
   const onSubmitHandler = async (event) => {
     event.preventDefault();
 
+    if (!window.Stripe) {
+      toast.error("Stripe is not loaded. Please refresh the page.");
+      return;
+    }
+
     const orderData = {
       userAddress: `${data.firstName} ${data.lastName}, ${data.address}, ${data.city}, ${data.state}, ${data.zip}`,
       phoneNumber: data.phoneNumber,
@@ -46,25 +51,24 @@ const PlaceOrder = () => {
     };
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/orders/create-checkout-session",
-        orderData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+      const response = await api.post(
+        "/orders/create-checkout-session",
+        orderData
       );
-
       if (response.data.sessionId) {
         const { error } = await stripe.redirectToCheckout({
           sessionId: response.data.sessionId,
         });
+
         if (error) {
+          console.error("Stripe SDK Error:", error);
           toast.error(error.message);
         }
       } else {
-        toast.error("Unable to create payment session. Please try again");
+        toast.error("Unable to create payment session.");
       }
     } catch (error) {
+      console.error("Order error:", error.response?.data || error.message);
       toast.error("Unable to place order. Please try again");
     }
   };

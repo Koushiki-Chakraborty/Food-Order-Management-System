@@ -23,7 +23,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import in.koushikichakraborty.foodiesapi.filters.JwtAuthenticationFilter;
 import in.koushikichakraborty.foodiesapi.service.AdminAuthService;
-import in.koushikichakraborty.foodiesapi.service.AppUserDetailsService;
+
 
 import lombok.AllArgsConstructor;
 
@@ -32,7 +32,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class SecurityConfig {
 
-    private final AppUserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AdminAuthService adminAuthService;
     private final PasswordEncoder passwordEncoder;
@@ -47,14 +47,14 @@ public class SecurityConfig {
         )
             .authorizeHttpRequests(auth -> auth
                 
-                // 1. PUBLIC ROUTES (Always first)
+                // 1. PUBLIC ROUTES
+                .requestMatchers("/api/register", "/api/login", "/api/admin/auth/**").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/foods/**").permitAll() // Allow everyone to VIEW foods
                 .requestMatchers("/ws-tracking/**").permitAll()
-                .requestMatchers("/api/register", "/api/login", "/api/foods").permitAll()
-                .requestMatchers("/api/admin/auth/**").permitAll() // Group admin auth together
-                
+
                 // 2. ADMIN ONLY ROUTES
                 .requestMatchers("/api/foods/**").hasAuthority("ADMIN") 
-                .requestMatchers("/api/orders/all", "/api/orders/status/**").hasAuthority("ADMIN") 
+                .requestMatchers("/api/orders/all", "/api/orders/status/**").hasAuthority("ADMIN")
 
                 // 3. USER/AUTHENTICATED ROUTES
                 .requestMatchers("/api/cart/**").authenticated() // Explicitly put cart here
@@ -86,19 +86,11 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager() {
-        // 1. Regular User Authentication Provider
-        DaoAuthenticationProvider userAuthProvider = new DaoAuthenticationProvider();
-        userAuthProvider.setUserDetailsService(userDetailsService); // Uses AppUserDetailsService (for UserEntity)
-        userAuthProvider.setPasswordEncoder(passwordEncoder);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService); 
+        authProvider.setPasswordEncoder(passwordEncoder);
 
-        // 2. Admin User Authentication Provider
-        DaoAuthenticationProvider adminAuthProvider = new DaoAuthenticationProvider();
-        // Create a dedicated UserDetailsService for the AdminUser logic
-        adminAuthProvider.setUserDetailsService(createAdminUserDetailsService()); 
-        adminAuthProvider.setPasswordEncoder(passwordEncoder);
-
-        // ProviderManager allows Spring Security to cycle through providers until one succeeds
-        return new ProviderManager(List.of(userAuthProvider, adminAuthProvider));
+        return new ProviderManager(authProvider);
     }
 
     @Bean

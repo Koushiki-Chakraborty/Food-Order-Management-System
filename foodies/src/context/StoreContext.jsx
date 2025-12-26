@@ -1,6 +1,5 @@
 import { createContext } from "react";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { fetchFoodList } from "../service/FoodService";
 import {
   addToCart,
@@ -14,22 +13,26 @@ export const StoreContext = createContext(null);
 export const StoreContextProvider = (props) => {
   const [user, setUser] = useState(null);
   const [foodList, setFoodList] = useState([]);
-
   const [quantities, setQuantities] = useState({});
-
   const [token, setToken] = useState("");
 
   const increaseQty = async (foodId) => {
     setQuantities((prev) => ({ ...prev, [foodId]: (prev[foodId] || 0) + 1 }));
-    await addToCart(foodId, token);
+    if (token) {
+      await addToCart(foodId);
+    }
   };
 
   const decreaseQty = async (foodId) => {
-    setQuantities((prev) => ({
-      ...prev,
-      [foodId]: prev[foodId] > 0 ? prev[foodId] - 1 : 0,
-    }));
-    await removeQtyFromCart(foodId, token);
+    if (quantities[foodId] > 0) {
+      setQuantities((prev) => ({
+        ...prev,
+        [foodId]: prev[foodId] - 1,
+      }));
+      if (token) {
+        await removeQtyFromCart(foodId);
+      }
+    }
   };
 
   const removeFromCart = async (foodId) => {
@@ -40,13 +43,17 @@ export const StoreContextProvider = (props) => {
     });
 
     if (token) {
-      await deleteFromCart(foodId, token);
+      await deleteFromCart(foodId);
     }
   };
 
-  const loadCartData = async (token) => {
-    const items = await getCartData(token);
-    setQuantities(items);
+  const loadCartData = async () => {
+    try {
+      const items = await getCartData();
+      setQuantities(items || {});
+    } catch (error) {
+      console.error("Failed to load cart:", error);
+    }
   };
 
   const clearCart = () => {
@@ -78,14 +85,23 @@ export const StoreContextProvider = (props) => {
 
       if (savedToken) {
         setToken(savedToken);
-        await loadCartData(savedToken);
+
+        try {
+          const items = await getCartData();
+          setQuantities(items || {});
+        } catch (err) {
+          console.error("Initial cart load failed", err);
+        }
       }
 
       if (savedUser) {
-        setUser(JSON.parse(savedUser));
+        try {
+          setUser(JSON.parse(savedUser));
+        } catch (e) {
+          console.error("Error parsing saved user", e);
+        }
       }
     }
-
     loadData();
   }, []);
 

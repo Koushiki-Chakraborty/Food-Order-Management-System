@@ -16,6 +16,8 @@ public class CartResponse {
 
     private String id;
     private String userId;
+
+    @Builder.Default
     private Map<String, Integer> items = new HashMap<>();
 
     
