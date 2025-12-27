@@ -1,6 +1,16 @@
 # FOOD ORDER MANAGEMENT SYSTEM (FULL-STACK)
 
-A robust, three-tier food delivery application designed for both seamless user ordering and secure administrative management. The project features a modern stack with a focus on secure payment processing and data integrity.
+A robust three-tier food delivery application designed for seamless user ordering, real-time order tracking, and secure administrative management.
+Built with a modern full-stack architecture focusing on security, data integrity, and scalability.
+
+---
+### Key Highlights
+
+- Secure User & Admin Authentication
+- Live Order Tracking (Normal Tracker) with real-time driver movement
+- Secure Stripe Checkout Integration
+- Dedicated Admin Panel for order & product management
+- Cloud-based image storage using AWS S3
 
 ---
 
@@ -16,8 +26,11 @@ A robust, three-tier food delivery application designed for both seamless user o
 - **Image Optimization:** Product and menu images are served securely from **AWS S3** for fast delivery.  
 
 ### ADMIN FEATURES
+- **Admin Login & Registration:** Secure admin authentication with role-based access.
 - **Dashboard Overview:** View a list of all user orders (`/api/orders/all`).  
-- **Status Management:** Update order status (e.g., *Food Preparing*, *Out for Delivery*) via a dedicated **PATCH** endpoint.  
+- **Status Management:** Update order status (e.g., *Food Preparing*, *Out for Delivery*)
+- **Automatic Delivery Completion:** When live tracking reaches destination: Order status automatically updates to Delivered, Live tracking map closes on the user side.
+- **Food Management (CRUD):** List All Food Items (View all available food products in a dedicated admin table), Add New Food (Create new food items with: Name, Description, Price, Category, Image upload (AWS S3)), Delete Food (Remove food items from the menu).
 - **Customer Data Retrieval:** View customer contact details (Address, Phone, Email) via a specialized modal without exposing them in the main table view.
 - **Cloud Asset Management:** Upload and manage product images directly via **AWS S3** integration. 
 
@@ -42,6 +55,7 @@ A robust, three-tier food delivery application designed for both seamless user o
 | **Cloud Storage** | AWS S3 (Amazon Simple Storage Service) |
 | **Security** | Spring Security 6 (JWT Authentication) |
 | **Payment Gateway** | Stripe Java SDK (Checkout Sessions) |
+| **Realtime** | WebSocket (STOMP + SockJS) |
 
 ### FRONTEND (`foodies` & `adminpanel`)
 | Technology | Description |
@@ -51,6 +65,8 @@ A robust, three-tier food delivery application designed for both seamless user o
 | **Routing** | React Router DOM |
 | **State Management** | React Context API (Global State) |
 | **Cloud Integration** | AWS S3 for media storage and delivery |
+| **Maps** | React-Leaflety |
+| **Realtime** | STOMP + SockJS |
 
 ## PROJECT STRUCTURE
 Food-Order-Management-System/
@@ -58,6 +74,7 @@ Food-Order-Management-System/
 ── foodies/ # FRONTEND: User Interface
 ── foodiesapi/ # BACKEND: Spring Boot API
 ── package.json
+── README.md
 
 ---
 
@@ -117,6 +134,7 @@ npm run dev
 
 - The admin panel and user panel are independent React apps communicating with the same backend.
 
+- Live tracking uses WebSocket-based normal tracker
 
 ---
 
